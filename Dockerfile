@@ -14,12 +14,10 @@
 # limitations under the License.
 FROM centos:centos7
 
-ENV SPARK_PROFILE 2.12
-ENV SPARK_VERSION 3.3.0
-ENV HADOOP_PROFILE 3
+ENV SPARK_PROFILE 2.4
+ENV SPARK_VERSION 2.4.8
+ENV HADOOP_PROFILE 2.7
 ENV SPARK_HOME /usr/local/spark
-ENV HADOOP_CONF_DIR /usr/lib/hadoop
-ENV SPARK_SUBMIT_OPTIONS --packages com.databricks:spark-csv_2.10:1.2.0
 
 # Update the image with the latest packages
 RUN yum update -y; yum clean all
@@ -36,20 +34,24 @@ yum clean all
 RUN yum remove java; yum remove jdk
 
 # install jdk7
-RUN yum install -y java-1.8.0-openjdk-devel
+RUN yum install -y java-1.7.0-openjdk-devel
 ENV JAVA_HOME /usr/lib/jvm/java
 ENV PATH $PATH:$JAVA_HOME/bin
+
+# Pyspark and it's dependencies
+RUN apt-get update && apt-get install -y curl vim wget python python-pip boto3 py4j pyspark[pandas_on_spark] plotly chart_studio
+
 
 # install spark
 RUN curl -s https://downloads.apache.org/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop$HADOOP_PROFILE.tgz | tar -xz -C /usr/local/
 RUN cd /usr/local && ln -s spark-$SPARK_VERSION-bin-hadoop$HADOOP_PROFILE spark
 
 # update boot script
-COPY entrypoint.sh /usr/share/entrypoint.sh
-RUN chown root.root /usr/share/entrypoint.sh
-RUN chmod 700 /usr/share/entrypoint.sh
+COPY entrypoint.sh /
+RUN chown root.root /entrypoint.sh
+RUN chmod 700 /entrypoint.sh
 
 #spark
 EXPOSE 8080 7077 8888 8081
 
-ENTRYPOINT ["/usr/share/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
