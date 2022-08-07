@@ -24,7 +24,7 @@ services:
       - "8082:8082"
     environment:
       - "SPARK_MASTER=spark://spark-master:7077"
-     volumes:
+    volumes:
       - ./spark:/opt/spark
       
       
