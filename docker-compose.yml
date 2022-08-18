@@ -1,23 +1,22 @@
 version: '3.3'
 services:
-
   spark-master:
-    image: apache/spark
     build: 
-      - context: .
-      - dockerfile: ./Dockerfile
+      context: .
+      dockerfile: ./Dockerfile
+    image: apache/spark
     container_name: spark-master
     expose:
       - "7077"
     ports:
+      - "8090:8080"
       - "7077:7077"
     environment:
       - "INIT_DAEMON_STEP=setup_spark"
       - "SPARK_ROLE=SPARK-MASTER"
     volumes:
       - ./usr/local/spark:/opt/spark
-      
-      
+     
   spark-worker:
     image: apache/spark
     container_name: spark-worker
